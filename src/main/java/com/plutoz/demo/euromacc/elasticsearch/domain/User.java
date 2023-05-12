@@ -4,12 +4,13 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+import java.util.UUID;
+
 @Data
 @Document(indexName = "user")
 public class User {
-    // TODO: consider to use UUID instead
     @Id
-    private String id;
+    private UUID id;
     private String firstName;
     private String lastName;
     private String email;

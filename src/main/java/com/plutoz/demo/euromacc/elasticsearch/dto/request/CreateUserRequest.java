@@ -10,6 +10,6 @@ public class CreateUserRequest {
     private String firstName;
     @NotBlank
     private String lastName;
-    @Email //TODO: check to ensure non-required behavior
+    @Email
     private String email;
 }

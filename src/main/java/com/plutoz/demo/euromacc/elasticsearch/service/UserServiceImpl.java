@@ -5,6 +5,7 @@ import com.plutoz.demo.euromacc.elasticsearch.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -15,6 +16,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User newEntity) {
+        newEntity.setId(UUID.randomUUID());
         return repository.save(newEntity);
     }
 
