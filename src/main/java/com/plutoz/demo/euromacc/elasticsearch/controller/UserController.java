@@ -5,20 +5,17 @@ import com.plutoz.demo.euromacc.elasticsearch.converter.UserConverter;
 import com.plutoz.demo.euromacc.elasticsearch.domain.User;
 import com.plutoz.demo.euromacc.elasticsearch.dto.request.CreateUserRequest;
 import com.plutoz.demo.euromacc.elasticsearch.dto.request.UserSearchRequest;
+import com.plutoz.demo.euromacc.elasticsearch.dto.response.ErrorResponse;
 import com.plutoz.demo.euromacc.elasticsearch.dto.response.UserResponse;
 import com.plutoz.demo.euromacc.elasticsearch.dto.response.UserSearchResponse;
 import com.plutoz.demo.euromacc.elasticsearch.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/elasticsearch")
@@ -32,6 +29,7 @@ public class UserController {
     }
 
     @PostMapping("/create")
+    @ResponseStatus(HttpStatus.CREATED)
     // According to YAGNI, using ResponseEntity<T> would be an overkill, so I'd rather keep code simple and more readable
     public UserResponse createUser(@NotNull @Valid @RequestBody final CreateUserRequest request) {
         User newUser = userService.create(converter.toModel(request));
@@ -54,12 +52,7 @@ public class UserController {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    private Map<String, String> handleValidationException(MethodArgumentNotValidException ex) {
-        return ex.getBindingResult().getAllErrors().stream()
-                .map(error -> (FieldError) error)
-                .collect(Collectors.toMap(
-                        FieldError::getField,
-                        fieldError -> Optional.ofNullable( fieldError.getDefaultMessage()).orElse("unknown error"))
-                );
+    private ErrorResponse handleValidationException(MethodArgumentNotValidException ex) {
+        return new ErrorResponse(MethodArgumentNotValidException.errorsToStringList(ex.getAllErrors()));
     }
 }

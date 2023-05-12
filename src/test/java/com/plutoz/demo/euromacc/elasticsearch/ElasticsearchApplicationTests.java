@@ -9,5 +9,4 @@ class ElasticsearchApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }
