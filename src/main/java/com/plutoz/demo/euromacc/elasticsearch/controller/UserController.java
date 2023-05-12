@@ -2,6 +2,7 @@ package com.plutoz.demo.euromacc.elasticsearch.controller;
 
 
 import com.plutoz.demo.euromacc.elasticsearch.converter.UserConverter;
+import com.plutoz.demo.euromacc.elasticsearch.domain.User;
 import com.plutoz.demo.euromacc.elasticsearch.dto.request.CreateUserRequest;
 import com.plutoz.demo.euromacc.elasticsearch.dto.request.UserSearchRequest;
 import com.plutoz.demo.euromacc.elasticsearch.dto.response.UserResponse;
@@ -28,13 +29,15 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    // Since there is no additional requirements would require ResponseEntity, I'd prefer to use the simpler solution by returning the response class directly instead of an extra wrapping (YAGNI)
+    // According to YAGNI, using ResponseEntity<T> would be an overkill, so I'd rather keep code simple and more readable
     public UserResponse createUser(@NotNull @Valid @RequestBody final CreateUserRequest request) {
-        return converter.toResponse(userService.create(converter.toModel(request)));
+        User newUser = userService.create(converter.toModel(request));
+
+        return converter.toResponse(newUser);
     }
 
-    // Since there is no additional requirements would require ResponseEntity, I'd prefer to use the simpler solution by returning the response class directly instead of an extra wrapping (YAGNI)
     @PostMapping("/search")
+    // According to YAGNI, using ResponseEntity<T> would be an overkill, so I'd rather keep code simple and more readable
     public UserSearchResponse searchUser(@NotNull @Valid @RequestBody final UserSearchRequest request) {
         List<UserResponse> userList = userService.findByName(request.getFirstName(), request.getLastName()).stream()
                 .map(converter::toResponse)
