@@ -10,12 +10,15 @@ import com.plutoz.demo.euromacc.elasticsearch.dto.response.UserSearchResponse;
 import com.plutoz.demo.euromacc.elasticsearch.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/elasticsearch")
@@ -47,5 +50,16 @@ public class UserController {
                 .userList(userList)
                 .total((long) userList.size())
                 .build();
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    private Map<String, String> handleValidationException(MethodArgumentNotValidException ex) {
+        return ex.getBindingResult().getAllErrors().stream()
+                .map(error -> (FieldError) error)
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        fieldError -> Optional.ofNullable( fieldError.getDefaultMessage()).orElse("unknown error"))
+                );
     }
 }
